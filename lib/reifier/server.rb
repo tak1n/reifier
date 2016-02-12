@@ -2,9 +2,6 @@ require 'pry'
 
 module Reifier
   class Server
-
-    attr_reader :app
-
     def initialize(app)
       @app = app
     end
