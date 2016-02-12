@@ -1,42 +1,39 @@
+require 'pry'
+
 module Reifier
   class Server
-    STATUS_CODES = {200 => 'OK', 500 => 'Internal Server Error'}
+    CR   = "\x0d"     # :nodoc:
+    LF   = "\x0a"     # :nodoc:
+    CRLF = "\x0d\x0a" # :nodoc:
 
-    attr_reader :app, :tcp_server
+    attr_reader :app
 
     def initialize(app)
       @app = app
     end
 
     def start
-      @tcp_server = TCPServer.new('localhost', 8080)
+      Socket.tcp_server_loop(8080) do |connection|
+        connection.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
-      loop do
-        socket   = tcp_server.accept
-        request  = socket.gets
-        response = ''
+        request_line = connection.gets
 
-        env = new_env(*request.split)
-        status, headers, body = app.call(env)
-
-        response << "HTTP/1.1 #{status} #{STATUS_CODES[status]}\r\n"
-        headers.each do |k, v|
-          response << "#{k}: #{v}\r\n"
-        end
-        response << "Connection: close\r\n"
-
-        socket.print response
-        socket.print "\r\n"
-
-        if body.is_a?(String)
-          socket.print body
-        else
-          body.each do |chunk|
-            socket.print chunk
-          end
+        headers = ''
+        while (line = connection.gets)
+          break if line == CRLF
+          headers << line
         end
 
-        socket.close
+        response = request_line + headers
+        connection.print "HTTP/1.1 200 OK\r\n" +
+                         "Content-Type: text/plain\r\n" +
+                         "Content-Length: #{response.bytesize}\r\n" +
+                         "Connection: close\r\n"
+
+        connection.print "\r\n"
+        connection.print response
+
+        connection.close
       end
     end
 
