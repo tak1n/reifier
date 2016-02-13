@@ -7,23 +7,34 @@ module Reifier
     def handle
       handle_request_line
       handle_headers
+
+      if @request_method == POST || @request_method == PUT
+        handle_body
+      end
     end
 
     def rack_env
       {
-        'REQUEST_METHOD'    => @request_method,
-        'SCRIPT_NAME'       => '',
-        'PATH_INFO'         => @location,
-        'QUERY_STRING'      => @query_string,
-        'SERVER_NAME'       => @socket.local_address.getnameinfo.first,
-        'SERVER_PORT'       => @socket.local_address.ip_port.to_s,
-        'rack.version'      => Rack.version.split('.'),
-        'rack.url_scheme'   => @protocol.downcase,
-        'rack.input'        => StringIO.new('').set_encoding(Encoding::ASCII_8BIT),
-        'rack.errors'       => STDERR,
-        'rack.multithread'  => false,
-        'rack.multiprocess' => false,
-        'rack.run_once'     => false
+        'rack.version'         => Rack.version.split('.'),
+        'rack.errors'          => STDERR,
+        'rack.multithread'     => false,
+        'rack.multiprocess'    => false,
+        'rack.run_once'        => false,
+        'rack.input'           => StringIO.new(@body).set_encoding(Encoding::ASCII_8BIT),
+        'rack.url_scheme'      => @protocol.split('/').first.downcase,
+        'REQUEST_METHOD'       => @request_method,
+        'REQUEST_PATH'         => @location,
+        'REQUEST_URI'          => @location,
+        'SCRIPT_NAME'          => '',
+        'PATH_INFO'            => @location,
+        'QUERY_STRING'         => @query_string,
+        'SERVER_PROTOCOL'      => @protocol,
+        'SERVER_SOFTWARE'      => 'Reifier Toy Server',
+        'SERVER_NAME'          => 'localhost',
+        'SERVER_PORT'          => '3000',
+        'CONTENT_LENGTH'       => @content_length,
+        'CONTENT_TYPE'         => '',
+        'reifier.socket'       => @socket
       }
     end
 
@@ -34,9 +45,8 @@ module Reifier
 
       @request_method  = request_line[0]
       @location        = request_line[1]
-      @query_string    = request_line[1].split('?').last
-      @protocol        = request_line[2].split('/').first
-      @protocol_verion = request_line[2].split('/').last
+      @query_string    = request_line[1].split('?')[1] || ''
+      @protocol        = request_line[2]
     end
 
     def handle_headers
@@ -44,7 +54,15 @@ module Reifier
       while (line = @socket.gets)
         break if line == CRLF
         @headers << line
+
+        if line.include?('Content-Length')
+          @content_length = line[/\d+/]
+        end
       end
+    end
+
+    def handle_body
+      @body = @socket.readpartial(@content_length.to_i)
     end
   end
 end

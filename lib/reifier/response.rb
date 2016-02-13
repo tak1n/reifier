@@ -1,6 +1,5 @@
 module Reifier
   class Response
-    STATUS_CODES = { 200 => 'OK', 500 => 'Internal Server Error' }.freeze
 
     def initialize(socket)
       @socket = socket
