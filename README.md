@@ -24,7 +24,9 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Use it through rackup:
+
+    $ rackup -s reifier
 
 ## Development
 
