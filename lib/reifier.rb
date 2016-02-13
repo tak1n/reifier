@@ -1,3 +1,5 @@
+require 'socket'
+
 require 'reifier/server'
 require 'reifier/request'
 require 'reifier/response'
