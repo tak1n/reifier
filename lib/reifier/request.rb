@@ -51,12 +51,17 @@ module Reifier
     private
 
     def handle_request_line
-      request_line = @socket.gets.split
+      # It is possible that gets returns nil
+      # "Returns nil if called at end of file" see http://ruby-doc.org/core-2.3.0/IO.html#method-i-gets
+      request_line = @socket.gets
+      raise EOFError unless request_line
 
-      @request_method  = request_line[0]
-      @location        = request_line[1]
-      @query_string    = request_line[1].split('?')[1] || ''
-      @protocol        = request_line[2]
+      request_line_array = request_line.split
+
+      @request_method  = request_line_array[0]
+      @location        = request_line_array[1]
+      @query_string    = request_line_array[1].split('?')[1] || ''
+      @protocol        = request_line_array[2]
     end
 
     def handle_headers

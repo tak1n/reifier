@@ -18,16 +18,20 @@ module Reifier
         connection.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
         Thread.new do
-          request = Request.new(connection)
-          request.handle
+          begin
+            request = Request.new(connection)
+            request.handle
 
-          status, headers, body = @app.call(request.rack_env)
+            status, headers, body = @app.call(request.rack_env)
 
-          response = Response.new(connection)
-          response.handle(status, headers, body)
+            response = Response.new(connection)
+            response.handle(status, headers, body)
 
-          if @options[:environment] == 'development'
-            log(request, response)
+            if @options[:environment] == 'development'
+              log(request, response)
+            end
+          rescue EOFError
+            # Umad?
           end
         end
       end
