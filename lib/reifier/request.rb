@@ -1,8 +1,10 @@
 module Reifier
   class Request
+    attr_reader :request_method, :location, :protocol
+
     def initialize(socket)
-      @socket = socket
-      @body   = ''
+      @socket  = socket
+      @body    = StringIO.new('')
     end
 
     def handle
@@ -25,7 +27,7 @@ module Reifier
         'rack.multithread'     => false,
         'rack.multiprocess'    => false,
         'rack.run_once'        => false,
-        'rack.input'           => StringIO.new(@body).set_encoding(Encoding::ASCII_8BIT),
+        'rack.input'           => @body.set_encoding(Encoding::ASCII_8BIT),
         'rack.url_scheme'      => @protocol.split('/').first.downcase,
         'REQUEST_METHOD'       => @request_method,
         'REQUEST_PATH'         => @location,
