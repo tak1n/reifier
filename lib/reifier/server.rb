@@ -1,5 +1,3 @@
-require 'pry'
-
 module Reifier
   class Server
     def initialize(app)
@@ -7,7 +5,7 @@ module Reifier
     end
 
     def start
-      Socket.tcp_server_loop(8080) do |connection|
+      Socket.tcp_server_loop('localhost', 3000) do |connection|
         connection.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
         request = Request.new(connection)
