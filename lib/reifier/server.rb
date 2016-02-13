@@ -6,25 +6,29 @@ module Reifier
     end
 
     def start
+      Thread.abort_on_exception = true
       server = TCPServer.new(@options[:Host], @options[:Port])
 
       puts "# Environment: #{@options[:environment]}"
       puts "# Listening on tcp://#{@options[:Host]}:#{@options[:Port]}"
+      puts "# PID: #{Process.pid}"
 
       loop do
         connection = server.accept
         connection.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
-        request = Request.new(connection)
-        request.handle
+        Thread.new do
+          request = Request.new(connection)
+          request.handle
 
-        status, headers, body = @app.call(request.rack_env)
+          status, headers, body = @app.call(request.rack_env)
 
-        response = Response.new(connection)
-        response.handle(status, headers, body)
+          response = Response.new(connection)
+          response.handle(status, headers, body)
 
-        if @options[:environment] == 'development'
-          log(request, response)
+          if @options[:environment] == 'development'
+            log(request, response)
+          end
         end
       end
     end
