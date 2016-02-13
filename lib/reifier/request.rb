@@ -2,6 +2,7 @@ module Reifier
   class Request
     def initialize(socket)
       @socket = socket
+      @body   = ''
     end
 
     def handle
@@ -14,7 +15,11 @@ module Reifier
     end
 
     def rack_env
-      {
+      # TODO:
+      # Automatically create proper headers
+      # See http://www.rubydoc.info/github/rack/rack/master/file/SPEC
+      # which are needed and when and how and sosososos
+      env = {
         'rack.version'         => Rack.version.split('.'),
         'rack.errors'          => STDERR,
         'rack.multithread'     => false,
@@ -32,10 +37,13 @@ module Reifier
         'SERVER_SOFTWARE'      => 'Reifier Toy Server',
         'SERVER_NAME'          => 'localhost',
         'SERVER_PORT'          => '3000',
-        'CONTENT_LENGTH'       => @content_length,
         'CONTENT_TYPE'         => '',
         'reifier.socket'       => @socket
       }
+
+      env['CONTENT_LENGTH'] = @content_length if @content_length
+
+      env
     end
 
     private
