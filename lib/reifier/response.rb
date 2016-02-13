@@ -1,5 +1,6 @@
 module Reifier
   class Response
+    attr_reader :status
 
     def initialize(socket)
       @socket = socket
@@ -18,7 +19,6 @@ module Reifier
     private
 
     def handle_request_line
-      puts "HTTP/1.1 #{@status} #{STATUS_CODES[@status]}\r\n"
       @socket.print "HTTP/1.1 #{@status} #{STATUS_CODES[@status]}\r\n"
     end
 
@@ -30,7 +30,6 @@ module Reifier
       headers << 'Connection: close' + CRLF
       headers << CRLF
 
-      puts headers
       @socket.print headers
     end
 
@@ -42,7 +41,6 @@ module Reifier
 
       body << CRLF
 
-      puts body
       @socket.print body
       @socket.close
     end
