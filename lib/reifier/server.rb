@@ -8,6 +8,9 @@ module Reifier
     def start
       server = TCPServer.new(@options[:Host], @options[:Port])
 
+      puts "# Environment: #{@options[:environment]}"
+      puts "# Listening on tcp://#{@options[:Host]}:#{@options[:Port]}"
+
       loop do
         connection = server.accept
         connection.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)

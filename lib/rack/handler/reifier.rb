@@ -5,6 +5,7 @@ module Rack
   module Handler
     module Reifier
       def self.run(app, options = {})
+        puts "Reifier #{::Reifier::VERSION} starting.."
         server = ::Reifier::Server.new(app, options)
         server.start
       end
