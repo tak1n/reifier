@@ -57,6 +57,7 @@ module Reifier
       # "Returns nil if called at end of file" see http://ruby-doc.org/core-2.3.0/IO.html#method-i-gets
       request_line = socket.gets
       raise EOFError unless request_line
+      raise HTTPParseError unless request_line.include?('HTTP')
 
       request_line_array = request_line.split
 

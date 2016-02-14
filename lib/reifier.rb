@@ -77,4 +77,6 @@ module Reifier
 
   POST = 'POST'.freeze
   PUT  = 'PUT'.freeze
+
+  HTTPParseError = Class.new(StandardError)
 end
