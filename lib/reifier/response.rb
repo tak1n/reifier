@@ -17,7 +17,7 @@ module Reifier
     private
 
     def handle_request_line(socket)
-      socket.print "HTTP/1.1 #{@status} #{STATUS_CODES[@status]}\r\n"
+      socket.print "HTTP/1.1 #{@status} #{HTTP_STATUS_CODES[@status]}\r\n"
     end
 
     def handle_headers(socket)
