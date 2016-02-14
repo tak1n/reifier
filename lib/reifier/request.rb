@@ -34,7 +34,7 @@ module Reifier
         'SERVER_PROTOCOL'      => @protocol,
         'SERVER_SOFTWARE'      => 'Reifier Toy Server',
         'SERVER_NAME'          => @options[:Host],
-        'SERVER_PORT'          => @options[:Port]
+        'SERVER_PORT'          => @options[:Port].to_s
       }
 
       @headers.each do |k, v|
@@ -61,11 +61,11 @@ module Reifier
       request_line_array = request_line.split
 
       @request_method  = request_line_array[0]
-      @request_path    = request_line_array[1]
+      @request_path    = request_line_array[1].split('?')[0]
       @query_string    = request_line_array[1].split('?')[1] || ''
       @protocol        = request_line_array[2]
 
-      @request_uri = @protocol.split('/').first.downcase + '://' + @options[:Host] + ':' + @options[:Port].to_s + @request_path
+      @request_uri = request_line_array[1]
     end
 
     def handle_headers(socket)
@@ -74,7 +74,7 @@ module Reifier
       while (line = socket.gets)
         break if line == CRLF
         if line.include?('Host')
-          @headers['Host'] = line.tr('Host: ', '').strip.chomp
+          @headers['HOST'] = line.gsub('Host: ', '').strip.chomp
         else
           key   = line.split(':').first.tr('-', '_').upcase
           value = line.split(':').last.strip.chomp
