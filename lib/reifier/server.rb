@@ -26,6 +26,7 @@ module Reifier
 
             response.request_method = request.request_method
             response.request_uri    = request.request_uri
+            response.protocol       = request.protocol
 
             response << @app.call(request.rack_env)
 
@@ -34,6 +35,8 @@ module Reifier
             log(request, response) if @options[:environment] == 'development'
           rescue EOFError
             # Umad?
+          rescue Errno::EPIPE
+            # Again mad?
           end
         end
       end
