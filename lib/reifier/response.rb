@@ -1,6 +1,6 @@
 module Reifier
   class Response
-    attr_accessor :request_method, :request_uri, :status, :headers, :body
+    attr_accessor :request_method, :request_uri, :status, :headers, :body, :protocol
 
     def handle(socket)
       handle_request_line(socket)
@@ -17,7 +17,7 @@ module Reifier
     private
 
     def handle_request_line(socket)
-      socket.print "HTTP/1.1 #{@status} #{HTTP_STATUS_CODES[@status]}\r\n"
+      socket.write "#{@protocol} #{@status} #{HTTP_STATUS_CODES[@status]}" + CRLF
     end
 
     def handle_headers(socket)
@@ -28,7 +28,7 @@ module Reifier
       headers << 'Connection: close' + CRLF
       headers << CRLF
 
-      socket.print headers
+      socket.write headers
     end
 
     def handle_body(socket)
@@ -39,7 +39,7 @@ module Reifier
 
       body << CRLF
 
-      socket.print body
+      socket.write body
       socket.close
     end
   end
