@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Benny Klotz"]
   spec.email         = ["benny.klotz92@gmail.com"]
 
-  spec.summary       = %q{A toy app server written in ruby for rack apps}
-  spec.description   = %q{A toy app server written in ruby for rack apps, threads? maybe, workers? not sure}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{A threaded rack app server written in pure ruby}
+  spec.description   = %q{A rack app server written in pure ruby}
+  spec.homepage      = "https://github.com/tak1n/reifier"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or

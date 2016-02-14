@@ -32,7 +32,7 @@ module Reifier
         'PATH_INFO'            => @request_path,
         'QUERY_STRING'         => @query_string,
         'SERVER_PROTOCOL'      => @protocol,
-        'SERVER_SOFTWARE'      => 'Reifier Toy Server',
+        'SERVER_SOFTWARE'      => "Reifier #{Reifier::VERSION}",
         'SERVER_NAME'          => @options[:Host],
         'SERVER_PORT'          => @options[:Port].to_s
       }
