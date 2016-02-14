@@ -6,6 +6,11 @@ module Reifier
     end
 
     def start
+      Signal.trap 'SIGINT' do
+        puts "\nCleaning up nothing for now..."
+        exit
+      end
+
       Thread.abort_on_exception = true
       server = TCPServer.new(@options[:Host], @options[:Port])
 
@@ -34,9 +39,13 @@ module Reifier
 
             log(request, response) if @options[:environment] == 'development'
           rescue EOFError
-            # Umad?
+            puts 'Request Line is empty'
+          rescue HTTPParseError
+            puts 'Request Line must include HTTP (HTTPS enabled?)'
           rescue Errno::EPIPE
-            # Again mad?
+            puts 'Writing to client failed :|'
+          ensure
+            socket.close
           end
         end
       end
