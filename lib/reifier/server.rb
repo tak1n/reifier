@@ -45,7 +45,7 @@ module Reifier
     private
 
     def log(request, response)
-      STDOUT.puts "[#{Time.now}] \"#{request.request_method} #{request.request_path} #{request.protocol}\" #{response.status}"
+      puts "[#{Time.now}] \"#{request.request_method} #{request.request_path} #{request.protocol}\" #{response.status}"
     end
   end
 end
