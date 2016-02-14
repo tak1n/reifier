@@ -6,13 +6,14 @@ module Reifier
     end
 
     def start
+      Thread.abort_on_exception = true
       Signal.trap 'SIGINT' do
         puts "\nCleaning up nothing for now..."
         exit
       end
 
-      Thread.abort_on_exception = true
       server = TCPServer.new(@options[:Host], @options[:Port])
+      pool   = Concurrent::FixedThreadPool.new(5)
 
       puts "# Environment: #{@options[:environment]}"
       puts "# Listening on tcp://#{@options[:Host]}:#{@options[:Port]}"
@@ -22,7 +23,7 @@ module Reifier
         socket = server.accept
         socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
-        Thread.new do
+        pool.post do
           begin
             request  = Request.new(@options)
             response = Response.new

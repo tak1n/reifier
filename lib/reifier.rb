@@ -1,5 +1,6 @@
 require 'socket'
 require 'stringio'
+require 'concurrent'
 
 require 'reifier/server'
 require 'reifier/request'
