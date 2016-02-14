@@ -38,7 +38,13 @@ module Reifier
       }
 
       @headers.each do |k, v|
-        env["HTTP_#{k}"] = v
+        # The environment must not contain the keys HTTP_CONTENT_TYPE or HTTP_CONTENT_LENGTH (use the versions without HTTP_).
+        # see http://www.rubydoc.info/github/rack/rack/master/file/SPEC
+        if k == 'CONTENT_LENGTH' || k == 'CONTENT_TYPE'
+          env[k] = v
+        else
+          env["HTTP_#{k}"] = v
+        end
       end
 
       env
@@ -78,11 +84,11 @@ module Reifier
     end
 
     def handle_body(socket)
-      @body = socket.readpartial(@content_length.to_i)
+      @body.write(socket.readpartial(@headers['CONTENT_LENGTH'].to_i))
     end
 
-    def request_with_body
-      @request_method == POST || @request_method == PUT
+    def request_with_body?
+      (@request_method == POST || @request_method == PUT) && @headers['CONTENT_LENGTH']
     end
   end
 end
