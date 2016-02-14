@@ -84,7 +84,7 @@ module Reifier
     end
 
     def handle_body(socket)
-      @body.write(socket.readpartial(@headers['CONTENT_LENGTH'].to_i))
+      @body = StringIO.new(socket.readpartial(@headers['CONTENT_LENGTH'].to_i))
     end
 
     def request_with_body?
