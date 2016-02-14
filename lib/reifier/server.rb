@@ -14,22 +14,24 @@ module Reifier
       puts "# PID: #{Process.pid}"
 
       loop do
-        connection = server.accept
-        connection.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
+        socket = server.accept
+        socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
         Thread.new do
           begin
-            request = Request.new(connection)
-            request.handle
+            request  = Request.new(@options)
+            response = Response.new
 
-            status, headers, body = @app.call(request.rack_env)
+            request.handle(socket)
 
-            response = Response.new(connection)
-            response.handle(status, headers, body)
+            response.request_method = request.request_method
+            response.request_uri    = request.request_uri
 
-            if @options[:environment] == 'development'
-              log(request, response)
-            end
+            response << @app.call(request.rack_env)
+
+            response.handle(socket)
+
+            log(request, response) if @options[:environment] == 'development'
           rescue EOFError
             # Umad?
           end
@@ -40,7 +42,7 @@ module Reifier
     private
 
     def log(request, response)
-      STDOUT.puts "[#{Time.now}] \"#{request.request_method} #{request.location} #{request.protocol}\" #{response.status}"
+      STDOUT.puts "[#{Time.now}] \"#{request.request_method} #{request.request_path} #{request.protocol}\" #{response.status}"
     end
   end
 end
