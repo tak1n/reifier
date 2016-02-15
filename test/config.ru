@@ -16,4 +16,5 @@ class MyApp
   end
 end
 
+use Rack::Lock
 run MyApp
