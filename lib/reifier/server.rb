@@ -13,16 +13,20 @@ module Reifier
       end
 
       server = TCPServer.new(@options[:Host], @options[:Port])
-      pool   = Concurrent::FixedThreadPool.new(5)
+
+      threads = @options[:Threads] || 5
+      pool   = Concurrent::FixedThreadPool.new(@options[:Threads] || 5)
 
       puts "# Environment: #{@options[:environment]}"
       puts "# Listening on tcp://#{@options[:Host]}:#{@options[:Port]}"
       puts "# PID: #{Process.pid}"
+      puts "# Number of Threads used: #{threads}"
 
       loop do
         socket = server.accept
         socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
+        # Thread.new do
         pool.post do
           begin
             request  = Request.new(@options)
@@ -39,13 +43,8 @@ module Reifier
             response.handle(socket)
 
             log(request, response) if @options[:environment] == 'development'
-          rescue EOFError
-            puts 'Request Line is empty'
-          rescue HTTPParseError
-            puts 'Request Line must include HTTP (HTTPS enabled?)'
-          rescue Errno::EPIPE
-            puts 'Writing to client failed :|'
-          ensure
+          rescue Exception => e
+            puts e.message
             socket.close
           end
         end
