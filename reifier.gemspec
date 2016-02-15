@@ -35,5 +35,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry', '~> 0.10'
   spec.add_development_dependency 'minitest-reporters', '~> 1.1'
   spec.add_development_dependency 'rubocop', '~> 0.37'
-  spec.add_development_dependency 'rack'
+  spec.add_development_dependency 'rack', '~> 2.0.0.alpha'
 end
