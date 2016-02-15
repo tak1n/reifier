@@ -1,6 +1,6 @@
 module Reifier
   class Response
-    attr_accessor :request_method, :request_uri, :status, :headers, :body, :protocol
+    attr_accessor :status, :headers, :body, :protocol
 
     def initialize
       @response = ''
