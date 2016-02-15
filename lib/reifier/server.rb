@@ -41,7 +41,7 @@ module Reifier
 
             log_request request, response if development?
           rescue Exception => e
-            log "\nError: #{e.class}\nMessage: #{e.message}" if development?
+            log "\nError: #{e.class}\nMessage: #{e.message}\n\nBacktrace:\n\t#{e.backtrace.join("\n\t")}" if development?
             socket.close
           end
         end
