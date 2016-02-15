@@ -2,10 +2,17 @@ module Reifier
   class Response
     attr_accessor :request_method, :request_uri, :status, :headers, :body, :protocol
 
+    def initialize
+      @response = ''
+    end
+
     def handle(socket)
-      handle_request_line(socket)
-      handle_headers(socket)
-      handle_body(socket)
+      handle_request_line
+      handle_headers
+      handle_body
+
+      socket.write @response
+      socket.close
     end
 
     def <<(rack_return)
@@ -16,31 +23,24 @@ module Reifier
 
     private
 
-    def handle_request_line(socket)
-      socket.write "#{@protocol} #{@status} #{HTTP_STATUS_CODES[@status]}" + CRLF
+    def handle_request_line
+      @response << "#{@protocol} #{@status} #{HTTP_STATUS_CODES[@status]}" + CRLF
     end
 
-    def handle_headers(socket)
-      headers = ''
+    def handle_headers
       @headers.each do |k, v|
-        headers << "#{k}: #{v}" + CRLF
+        @response << "#{k}: #{v}" + CRLF
       end
-      headers << 'Connection: close' + CRLF
-      headers << CRLF
-
-      socket.write headers
+      @response << 'Connection: close' + CRLF
+      @response << CRLF
     end
 
-    def handle_body(socket)
-      body = ''
+    def handle_body
       @body.each do |chunk|
-        body << chunk
+        @response << chunk
       end
 
-      body << CRLF
-
-      socket.write body
-      socket.close
+      @response << CRLF
     end
   end
 end
