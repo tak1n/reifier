@@ -34,17 +34,14 @@ module Reifier
 
             request.handle(socket)
 
-            response.request_method = request.request_method
-            response.request_uri    = request.request_uri
-            response.protocol       = request.protocol
-
+            response.protocol = request.protocol
             response << @app.call(request.rack_env)
 
             response.handle(socket)
 
-            log(request, response) if @options[:environment] == 'development'
+            log_request request, response if development?
           rescue Exception => e
-            puts e.message
+            log "\nError: #{e.class}\nMessage: #{e.message}" if development?
             socket.close
           end
         end
@@ -53,7 +50,15 @@ module Reifier
 
     private
 
-    def log(request, response)
+    def development?
+      @options[:environment] == 'development'
+    end
+
+    def log(message)
+      puts "[#{Time.now}] #{message}"
+    end
+
+    def log_request(request, response)
       puts "[#{Time.now}] \"#{request.request_method} #{request.request_path} #{request.protocol}\" #{response.status}"
     end
   end
