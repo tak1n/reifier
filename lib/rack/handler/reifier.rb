@@ -9,6 +9,12 @@ module Rack
         server = ::Reifier::Server.new(app, options)
         server.start
       end
+
+      def self.valid_options
+        {
+          'Threads=THREADS' => 'Number of threads (default: 5)'
+        }
+      end
     end
 
     register :reifier, Reifier
