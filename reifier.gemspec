@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Benny Klotz"]
   spec.email         = ["benny.klotz92@gmail.com"]
 
-  spec.summary       = %q{A threaded rack app server written in pure ruby}
-  spec.description   = %q{A rack app server written in pure ruby}
+  spec.summary       = %q{A threaded and preforked rack app server written in pure ruby}
+  spec.description   = %q{A threaded and preforked rack app server written in pure ruby}
   spec.homepage      = "https://github.com/tak1n/reifier"
   spec.license       = "MIT"
 
