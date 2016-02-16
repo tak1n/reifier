@@ -41,6 +41,8 @@ module Reifier
       end
 
       @response << CRLF
+    ensure
+      @body.close if @body.respond_to :close
     end
   end
 end
