@@ -32,7 +32,11 @@ Use it through rackup:
 
 You can adapt the ThreadPool sized with following option:
 
-    $ rackup -s reifier -O Threads=16
+    $ rackup -s reifier -O Threads=8
+
+Also the amount of workers is adaptable:
+
+    $ rackup -s reifier -O Workers=5
 
 ## Development
 
