@@ -5,7 +5,7 @@ module Rack
   module Handler
     module Reifier
       DEFAULT_OPTIONS = {
-        Workers: 3,
+        Workers: 1,
         Threads: 16
       }.freeze
 
@@ -18,7 +18,8 @@ module Rack
 
       def self.valid_options
         {
-          'Threads=THREADS' => 'Number of threads (default: 5)'
+          'Threads=THREADS' => 'Number of threads (default: 5)',
+          'Workers=WORKERS' => 'Number of workers (default: 1)'
         }
       end
     end
