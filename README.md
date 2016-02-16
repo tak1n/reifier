@@ -6,9 +6,11 @@ reify
 
 (transitive) to consider or make (an abstract idea or concept) real or concrete
 
+Reifier is a threaded and pre forked rack app server written in pure ruby.
+
 ## Is it any good?
 
-[Yes](http://news.ycombinator.com/item?id=3067434), no really just a fun project use it in production when u want :P
+[Yes](http://news.ycombinator.com/item?id=3067434), no really just a fun project use it in production if you want :P
 
 ## Y u no benchmark?!
 
