@@ -6,6 +6,15 @@ reify
 
 (transitive) to consider or make (an abstract idea or concept) real or concrete
 
+## Is it any good?
+
+[Yes](http://news.ycombinator.com/item?id=3067434), no really just a fun project use it in production when u want :P
+
+## Y u no benchmark?!
+
+Benchmarking a non feature complete HTTP server is very reasonable but here it is:
+[benchmarky marky](https://gist.github.com/tak1n/90c8d59111f0f9a3cd36)
+
 ## Installation
 
 Add this line to your application's Gemfile:
