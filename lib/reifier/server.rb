@@ -63,10 +63,8 @@ module Reifier
               response << @app.call(request.rack_env)
 
               response.handle(socket)
-
-              log_request request, response if development?
             rescue Exception => e
-              log "\nError: #{e.class}\nMessage: #{e.message}\n\nBacktrace:\n\t#{e.backtrace.join("\n\t")}" if development?
+              log_error "\nError: #{e.class}\nMessage: #{e.message}\n\nBacktrace:\n\t#{e.backtrace.join("\n\t")}"
               socket.close
             end
           end
@@ -74,16 +72,8 @@ module Reifier
       end
     end
 
-    def development?
-      @options[:environment] == 'development'
-    end
-
-    def log(message)
-      puts "[#{Time.now}] #{message}"
-    end
-
-    def log_request(request, response)
-      puts "[#{Time.now}] \"#{request.request_method} #{request.request_path} #{request.protocol}\" #{response.status}"
+    def log_error(message)
+      STDERR.puts "[#{Time.now}] #{message}"
     end
   end
 end
