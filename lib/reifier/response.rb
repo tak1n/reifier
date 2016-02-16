@@ -42,7 +42,7 @@ module Reifier
 
       @response << CRLF
     ensure
-      @body.close if @body.respond_to :close
+      @body.close if @body.respond_to? :close
     end
   end
 end
