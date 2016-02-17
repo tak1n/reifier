@@ -18,7 +18,7 @@ matrix:
     - rvm: jruby-9000
 
 script:
-  - "bundle exec rake"
+  - CODECLIMATE_REPO_TOKEN=b84ce34b20f2a809814493585d027aa71ab07e13116bf68430511548815d9411 bundle exec rake
 
 addons:
   code_climate:
