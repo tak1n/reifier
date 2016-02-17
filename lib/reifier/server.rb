@@ -49,7 +49,7 @@ module Reifier
 
       return unless File.exist?(path)
 
-      lines = File.read(Rails.root.join('config/reifier.rb')).split("\n")
+      lines = File.read(path).split("\n")
 
       lines.each do |line|
         option = line.split.first.capitalize
