@@ -2,16 +2,17 @@ module Reifier
   class Request
     attr_reader :request_method, :request_path, :protocol, :request_uri
 
-    def initialize(options)
+    def initialize(socket, options)
+      @socket  = socket
       @body    = StringIO.new('')
       @options = options
     end
 
-    def handle(socket)
-      handle_request_line(socket)
-      handle_headers(socket)
+    def handle
+      handle_request_line
+      handle_headers
 
-      handle_body(socket) if request_with_body?
+      handle_body if request_with_body?
     end
 
     def rack_env
@@ -34,7 +35,9 @@ module Reifier
         'SERVER_PROTOCOL'      => @protocol,
         'SERVER_SOFTWARE'      => "Reifier #{Reifier::VERSION}",
         'SERVER_NAME'          => @options[:Host],
-        'SERVER_PORT'          => @options[:Port].to_s
+        'SERVER_PORT'          => @options[:Port].to_s,
+        'HTTP_VERSION'         => @protocol,
+        'REMOTE_ADDR'          => @socket.addr.last
       }
 
       @headers.each do |k, v|
@@ -52,10 +55,10 @@ module Reifier
 
     private
 
-    def handle_request_line(socket)
+    def handle_request_line
       # It is possible that gets returns nil
       # "Returns nil if called at end of file" see http://ruby-doc.org/core-2.3.0/IO.html#method-i-gets
-      request_line = socket.gets
+      request_line = @socket.gets
       raise EOFError unless request_line
       raise HTTPParseError unless request_line.include?('HTTP')
 
@@ -69,10 +72,10 @@ module Reifier
       @request_uri = request_line_array[1]
     end
 
-    def handle_headers(socket)
+    def handle_headers
       @headers = {}
 
-      while (line = socket.gets)
+      while (line = @socket.gets)
         break if line == CRLF
         if line.include?('Host')
           @headers['HOST'] = line.gsub('Host: ', '').strip.chomp
@@ -84,8 +87,8 @@ module Reifier
       end
     end
 
-    def handle_body(socket)
-      @body = StringIO.new(socket.readpartial(@headers['CONTENT_LENGTH'].to_i))
+    def handle_body
+      @body = StringIO.new(@socket.readpartial(@headers['CONTENT_LENGTH'].to_i))
     end
 
     def request_with_body?

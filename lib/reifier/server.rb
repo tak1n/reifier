@@ -54,15 +54,15 @@ module Reifier
 
           pool.post do
             begin
-              request  = Request.new(@options)
-              response = Response.new
+              request  = Request.new(socket, @options)
+              response = Response.new(socket)
 
-              request.handle(socket)
+              request.handle
 
               response.protocol = request.protocol
               response << @app.call(request.rack_env)
 
-              response.handle(socket)
+              response.handle
             rescue Exception => e
               log_error "\nError: #{e.class}\nMessage: #{e.message}\n\nBacktrace:\n\t#{e.backtrace.join("\n\t")}"
               socket.close

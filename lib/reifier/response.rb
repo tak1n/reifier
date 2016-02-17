@@ -2,17 +2,18 @@ module Reifier
   class Response
     attr_accessor :status, :headers, :body, :protocol
 
-    def initialize
+    def initialize(socket)
+      @socket   = socket
       @response = ''
     end
 
-    def handle(socket)
+    def handle
       handle_request_line
       handle_headers
       handle_body
 
-      socket.write @response
-      socket.close
+      @socket.write @response
+      @socket.close
     end
 
     def <<(rack_return)
