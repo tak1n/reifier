@@ -9,9 +9,11 @@ reify
 Reifier is a threaded and pre forked rack app server written in pure ruby.
 
 [![Gem Version](https://badge.fury.io/rb/reifier.svg)](https://badge.fury.io/rb/reifier)
-[![Dependency Status](https://gemnasium.com/tak1n/reifier.svg)](https://gemnasium.com/tak1n/reifier)
-[![Code Climate](https://codeclimate.com/github/tak1n/reifier/badges/gpa.svg)](https://codeclimate.com/github/tak1n/reifier)
 [![Build Status](https://travis-ci.org/tak1n/reifier.svg?branch=master)](https://travis-ci.org/tak1n/reifier)
+[![Code Climate](https://codeclimate.com/github/tak1n/reifier/badges/gpa.svg)](https://codeclimate.com/github/tak1n/reifier)
+[![Test Coverage](https://codeclimate.com/github/tak1n/reifier/badges/coverage.svg)](https://codeclimate.com/github/tak1n/reifier/coverage)
+[![Inline docs](http://inch-ci.org/github/tak1n/reifier.svg?branch=master)](http://inch-ci.org/github/tak1n/reifier)
+[![Dependency Status](https://gemnasium.com/tak1n/reifier.svg)](https://gemnasium.com/tak1n/reifier)
 
 ## Is it any good?
 
