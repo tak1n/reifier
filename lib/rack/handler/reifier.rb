@@ -18,7 +18,7 @@ module Rack
 
       def self.valid_options
         {
-          'Threads=THREADS' => 'Number of threads (default: 5)',
+          'Threads=THREADS' => 'Number of threads (default: 16)',
           'Workers=WORKERS' => 'Number of workers (default: 1)'
         }
       end
