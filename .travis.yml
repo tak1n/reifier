@@ -20,6 +20,10 @@ matrix:
 script:
   - "bundle exec rake"
 
+addons:
+  code_climate:
+    repo_token: b84ce34b20f2a809814493585d027aa71ab07e13116bf68430511548815d9411
+
 notifications:
   email:
     recipients:
