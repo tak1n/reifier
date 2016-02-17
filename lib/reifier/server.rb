@@ -44,8 +44,6 @@ module Reifier
 
     def spawn_worker(server)
       fork do
-        Thread.abort_on_exception = true
-
         pool  = Concurrent::FixedThreadPool.new(@options[:Threads])
 
         loop do
@@ -64,16 +62,16 @@ module Reifier
 
               response.handle
             rescue Exception => e
-              log_error "\nError: #{e.class}\nMessage: #{e.message}\n\nBacktrace:\n\t#{e.backtrace.join("\n\t")}"
               socket.close
+
+              STDERR.puts ERROR_HEADER
+              STDERR.puts "#{e.class}: #{e}"
+              STDERR.puts e.backtrace
+              STDERR.puts ERROR_FOOTER
             end
           end
         end
       end
-    end
-
-    def log_error(message)
-      STDERR.puts "[#{Time.now}] #{message}"
     end
   end
 end

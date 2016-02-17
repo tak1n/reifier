@@ -80,4 +80,6 @@ module Reifier
   PUT  = 'PUT'.freeze
 
   HTTPParseError = Class.new(StandardError)
+  ERROR_HEADER = '=============================== FATAL SERVER ERROR =============================='.freeze
+  ERROR_FOOTER = "=================================================================================\n\n\n".freeze
 end
