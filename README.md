@@ -41,13 +41,23 @@ Use it through rackup:
 
 ## Available Options
 
-You can adapt the ThreadPool sized with following option:
+You can adapt the ThreadPool size with following option:
 
     $ rackup -s reifier -O Threads=8
 
 Also the amount of workers is adaptable:
 
     $ rackup -s reifier -O Workers=5
+
+## Config File
+
+You can also use a config file for these and more settings.
+
+When you are using `rails s` reifier tries to load the file from `Rails.root/config/reifier.rb`
+
+When you are using any other rack app it tries to load the file from `Dir.pwd/config/reifier.rb`
+
+See the [example config](examples/reifier.rb)
 
 ## Development
 
