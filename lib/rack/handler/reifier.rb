@@ -11,8 +11,9 @@ module Rack
 
       def self.run(app, options = {})
         options = DEFAULT_OPTIONS.merge(options)
-        puts "Reifier #{::Reifier::VERSION} starting.."
+        puts "======= Reifier #{::Reifier::VERSION} starting ======="
         server = ::Reifier::Server.new(app, options)
+        server.load_configuration
         server.start
       end
 
