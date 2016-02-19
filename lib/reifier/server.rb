@@ -67,20 +67,25 @@ module Reifier
     def spawn_worker(server)
       fork do
         pool = Concurrent::ThreadPoolExecutor.new(
-          # min_threads:     [2, Concurrent.processor_count].max,
-          # max_threads:     [2, Concurrent.processor_count].max,
-          # max_queue:       [2, Concurrent.processor_count].max * 5,
           min_threads:     @options[:MinThreads],
           max_threads:     @options[:MaxThreads],
           max_queue:       0,
-          fallback_policy: :caller_runs
+          fallback_policy: :caller_runs,
         )
+
+        # Signal.trap 'SIGINT' do
+        #   puts "Shutting down thread pool in Worker: #{Process.pid}"
+        #   pool.shutdown
+        #   pool.wait_for_termination
+
+        #   exit
+        # end
 
         loop do
           socket = server.accept
           socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
-          Concurrent::Future.new(executor: pool).execute do
+          Concurrent::Future.new(executor: pool) do
             begin
               request  = Request.new(socket, @options)
               response = Response.new(socket)
@@ -101,7 +106,7 @@ module Reifier
               STDERR.puts e.backtrace
               STDERR.puts ERROR_FOOTER
             end
-          end
+          end.execute
         end
       end
     end
