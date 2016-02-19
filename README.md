@@ -48,9 +48,9 @@ Use it through rackup:
 
 ## Available Options
 
-You can adapt the ThreadPool size with following option:
+You can adapt the ThreadPool size with following options:
 
-    $ rackup -s reifier -O Threads=8
+    $ rackup -s reifier -O MinThreads=8 -O MaxThreads=16
 
 Also the amount of workers is adaptable:
 
