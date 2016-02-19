@@ -5,6 +5,27 @@ module Reifier
       @options = options
     end
 
+    def load_configuration
+      if defined?(Rails)
+        path = Rails.root.join('config/reifier.rb')
+      else
+        path = Dir.pwd + '/reifier.rb'
+      end
+
+      return unless File.exist?(path)
+
+      lines = File.read(path).split("\n")
+
+      lines.each do |line|
+        option = line.split.first.capitalize
+        value  = line.split.last
+
+        @options[option.to_sym] = value
+      end
+
+      puts "======= Loaded settings from #{path} =======\n"
+    end
+
     def start
       server = TCPServer.new(@options[:Host], @options[:Port])
 
@@ -38,27 +59,6 @@ module Reifier
         child_pids.delete(pid)
         child_pids << spawn_worker
       end
-    end
-
-    def load_configuration
-      if defined?(Rails)
-        path = Rails.root.join('config/reifier.rb')
-      else
-        path = Dir.pwd + '/reifier.rb'
-      end
-
-      return unless File.exist?(path)
-
-      lines = File.read(path).split("\n")
-
-      lines.each do |line|
-        option = line.split.first.capitalize
-        value  = line.split.last
-
-        @options[option.to_sym] = value
-      end
-
-      puts "======= Loaded settings from #{path} =======\n"
     end
 
     private
