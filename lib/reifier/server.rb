@@ -65,13 +65,11 @@ module Reifier
 
     def spawn_worker(server)
       fork do
-        pool  = Concurrent::FixedThreadPool.new(@options[:Threads])
-
         loop do
           socket = server.accept
           socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
-          pool.post do
+          Concurrent::Future.execute do
             begin
               request  = Request.new(socket, @options)
               response = Response.new(socket)
@@ -82,6 +80,8 @@ module Reifier
               response << @app.call(request.rack_env)
 
               response.handle
+            rescue EOFError
+              # nothing, shit happens
             rescue Exception => e
               socket.close
 
