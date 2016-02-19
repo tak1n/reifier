@@ -17,13 +17,12 @@ module Reifier
       lines = File.read(path).split("\n")
 
       lines.each do |line|
-        option = line.split.first.capitalize
-        value  = line.split.last
-
-        @options[option.to_sym] = value
+        eval(line)
       end
 
       puts "======= Loaded settings from #{path} =======\n"
+    rescue NoMethodError => e
+      raise UnsupportedOptionError, "Option #{e.name} is not supported from config file"
     end
 
     def start
@@ -63,6 +62,15 @@ module Reifier
     end
 
     private
+
+    def threads(min, max)
+      @options[:MinThreads] = min
+      @options[:MaxThreads] = max
+    end
+
+    def workers(count)
+      @options[:Workers] = count
+    end
 
     def spawn_worker(server)
       fork do

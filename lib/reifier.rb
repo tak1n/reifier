@@ -79,7 +79,8 @@ module Reifier
   POST = 'POST'.freeze
   PUT  = 'PUT'.freeze
 
-  HTTPParseError = Class.new(StandardError)
+  HTTPParseError         = Class.new(StandardError)
+  UnsupportedOptionError = Class.new(StandardError)
   ERROR_HEADER = '=============================== FATAL SERVER ERROR =============================='.freeze
   ERROR_FOOTER = "=================================================================================\n\n\n".freeze
 end
