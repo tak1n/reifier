@@ -46,11 +46,12 @@ module Reifier
         exit
       end
 
+      puts "# Ruby version: #{RUBY_VERSION}"
+      puts "# Min threads: #{@options[:MinThreads]}, max threads: #{@options[:MaxThreads]}"
       puts "# Environment: #{@options[:environment]}"
-      puts "# Listening on tcp://#{@options[:Host]}:#{@options[:Port]}"
-      puts "# Master PID: #{Process.pid}"
-      puts "# Number of Threads used: #{@options[:Threads]}"
       puts "# Number of Workers used: #{@options[:Workers]}"
+      puts "# Master PID: #{Process.pid}"
+      puts "# Listening on tcp://#{server.addr.last}:#{@options[:Port]}"
 
       loop do
         pid = Process.wait
@@ -65,11 +66,21 @@ module Reifier
 
     def spawn_worker(server)
       fork do
+        pool = Concurrent::ThreadPoolExecutor.new(
+          # min_threads:     [2, Concurrent.processor_count].max,
+          # max_threads:     [2, Concurrent.processor_count].max,
+          # max_queue:       [2, Concurrent.processor_count].max * 5,
+          min_threads:     @options[:MinThreads],
+          max_threads:     @options[:MaxThreads],
+          max_queue:       0,
+          fallback_policy: :caller_runs
+        )
+
         loop do
           socket = server.accept
           socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
-          Concurrent::Future.execute do
+          Concurrent::Future.new(executor: pool).execute do
             begin
               request  = Request.new(socket, @options)
               response = Response.new(socket)

@@ -6,7 +6,8 @@ module Rack
     module Reifier
       DEFAULT_OPTIONS = {
         Workers: 1,
-        Threads: 16
+        MinThreads: 0,
+        MaxThreads: 16
       }.freeze
 
       def self.run(app, options = {})
@@ -19,7 +20,8 @@ module Rack
 
       def self.valid_options
         {
-          'Threads=THREADS' => 'Number of threads (default: 16)',
+          'MinThreads=MINTHREADS' => 'Number of minimal threads (default: 0)',
+          'MaxThreads=MAXTHREADS' => 'Number of minimal threads (default: 16)',
           'Workers=WORKERS' => 'Number of workers (default: 1)'
         }
       end
