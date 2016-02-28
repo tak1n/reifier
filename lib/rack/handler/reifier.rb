@@ -5,7 +5,6 @@ module Rack
   module Handler
     module Reifier
       DEFAULT_OPTIONS = {
-        Workers: 1,
         MinThreads: 0,
         MaxThreads: 16
       }.freeze
@@ -22,7 +21,7 @@ module Rack
         {
           'MinThreads=MINTHREADS' => 'Number of minimal threads (default: 0)',
           'MaxThreads=MAXTHREADS' => 'Number of minimal threads (default: 16)',
-          'Workers=WORKERS' => 'Number of workers (default: 1)'
+          'Workers=WORKERS'       => 'Number of workers (default: none)'
         }
       end
     end
