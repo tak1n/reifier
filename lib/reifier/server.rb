@@ -28,9 +28,40 @@ module Reifier
     def start
       server = TCPServer.new(@options[:Host], @options[:Port])
 
+      puts "# Ruby version: #{RUBY_VERSION}"
+      puts "# Min threads: #{@options[:MinThreads]}, max threads: #{@options[:MaxThreads]}"
+      puts "# Environment: #{@options[:environment]}"
+      puts "# Master PID: #{Process.pid}"
+      puts "# Listening on tcp://#{server.addr.last}:#{@options[:Port]}"
+
+      if @options[:Workers]
+        start_clustered(server)
+      else
+        start_single(server)
+      end
+    end
+
+    private
+
+    def start_single(server)
+      puts '# Started in single mode'
+      start!(server)
+    end
+
+    def start_clustered(server)
+      puts '# Started in clustered mode'
       child_pids = []
-      @options[:Workers].to_i.times do
-        child_pids << spawn_worker(server)
+
+      puts '# ================================'
+      puts "# Spinning up #{@options[:Workers].to_i} Workers"
+      @options[:Workers].to_i.times do |i|
+        pid = fork do
+          start!(server)
+        end
+
+        puts "# Worker #{i} started with pid: #{pid}"
+
+        child_pids << pid
       end
 
       Signal.trap 'SIGINT' do
@@ -45,23 +76,15 @@ module Reifier
         exit
       end
 
-      puts "# Ruby version: #{RUBY_VERSION}"
-      puts "# Min threads: #{@options[:MinThreads]}, max threads: #{@options[:MaxThreads]}"
-      puts "# Environment: #{@options[:environment]}"
-      puts "# Number of Workers used: #{@options[:Workers]}"
-      puts "# Master PID: #{Process.pid}"
-      puts "# Listening on tcp://#{server.addr.last}:#{@options[:Port]}"
-
       loop do
         pid = Process.wait
         STDERR.puts "Process #{pid} crashed"
 
         child_pids.delete(pid)
-        child_pids << spawn_worker
+        child_pids << spawn_worker(server)
       end
     end
 
-    private
 
     def threads(min, max)
       @options[:MinThreads] = min
@@ -72,50 +95,40 @@ module Reifier
       @options[:Workers] = count
     end
 
-    def spawn_worker(server)
-      fork do
-        pool = Concurrent::ThreadPoolExecutor.new(
-          min_threads:     @options[:MinThreads],
-          max_threads:     @options[:MaxThreads],
-          max_queue:       0,
-          fallback_policy: :caller_runs,
-        )
+    def start!(server)
+      pool = Concurrent::ThreadPoolExecutor.new(
+        min_threads:     @options[:MinThreads],
+        max_threads:     @options[:MaxThreads],
+        max_queue:       0,
+        fallback_policy: :caller_runs,
+      )
 
-        # Signal.trap 'SIGINT' do
-        #   puts "Shutting down thread pool in Worker: #{Process.pid}"
-        #   pool.shutdown
-        #   pool.wait_for_termination
+      loop do
+        socket = server.accept
+        socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
-        #   exit
-        # end
+        Concurrent::Future.new(executor: pool) do
+          begin
+            request  = Request.new(socket, @options)
+            response = Response.new(socket)
 
-        loop do
-          socket = server.accept
-          socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
+            request.handle
 
-          Concurrent::Future.new(executor: pool) do
-            begin
-              request  = Request.new(socket, @options)
-              response = Response.new(socket)
+            response.protocol = request.protocol
+            response << @app.call(request.rack_env)
 
-              request.handle
+            response.handle
+          rescue EOFError
+            # nothing, shit happens
+          rescue Exception => e
+            socket.close
 
-              response.protocol = request.protocol
-              response << @app.call(request.rack_env)
-
-              response.handle
-            rescue EOFError
-              # nothing, shit happens
-            rescue Exception => e
-              socket.close
-
-              STDERR.puts ERROR_HEADER
-              STDERR.puts "#{e.class}: #{e}"
-              STDERR.puts e.backtrace
-              STDERR.puts ERROR_FOOTER
-            end
-          end.execute
-        end
+            STDERR.puts ERROR_HEADER
+            STDERR.puts "#{e.class}: #{e}"
+            STDERR.puts e.backtrace
+            STDERR.puts ERROR_FOOTER
+          end
+        end.execute
       end
     end
   end
