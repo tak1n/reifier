@@ -46,6 +46,10 @@ Use it through rackup:
 
     $ rackup -s reifier
 
+Or with rails:
+
+    $ rails s reifier
+
 ## Available Options
 
 You can adapt the ThreadPool size with following options:
