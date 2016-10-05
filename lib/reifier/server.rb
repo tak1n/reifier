@@ -120,13 +120,8 @@ module Reifier
             response.handle
           rescue EOFError
             # nothing, shit happens
-          rescue Exception => e
+          ensure
             socket.close
-
-            STDERR.puts ERROR_HEADER
-            STDERR.puts "#{e.class}: #{e}"
-            STDERR.puts e.backtrace
-            STDERR.puts ERROR_FOOTER
           end
         end.execute
       end

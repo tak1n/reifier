@@ -13,7 +13,6 @@ module Reifier
       handle_body
 
       @socket.write @response
-      @socket.close
     end
 
     def <<(rack_return)
