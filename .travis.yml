@@ -5,17 +5,16 @@ before_install:
   - gem install bundler
 
 rvm:
-  - 2.2.4
-  - 2.3.0
+  - 2.5.*
+  - 2.6.*
+  - 2.7.*
   - ruby-head
-  - jruby-9000
-  - rbx-3
+  - jruby-9.2
 
 matrix:
   allow_failures:
     - rvm: ruby-head
-    - rvm: rbx-3
-    - rvm: jruby-9000
+    - rvm: jruby-9.2
 
 script:
   - CODECLIMATE_REPO_TOKEN=b84ce34b20f2a809814493585d027aa71ab07e13116bf68430511548815d9411 bundle exec rake
